@@ -19,14 +19,7 @@ class StockLocation(models.Model):
 class StockMove(models.Model):
     _inherit = 'stock.move'
     _description = 'Movimiento del Stock'
-
-    product_id = fields.Many2one('product.product', string="Producto", required=True)
-    source_location_id = fields.Many2one('stock.location', string="Ubicación de Origen")
-    destination_location_id = fields.Many2one('stock.location', string="Ubicación de Destino")
-    quantity = fields.Float(string="Cantidad")
-    move_date = fields.Datetime(string="Fecha de Movimiento", default=fields.Datetime.now)
-    move_type = fields.Selection([('in', 'Entrada'), ('out', 'Salida')], string="Tipo de Movimiento")
-
+0
 class StockAdjustment(models.Model):
     _name = 'stock.adjustment'
     _description = 'Ajuste del Stock'
