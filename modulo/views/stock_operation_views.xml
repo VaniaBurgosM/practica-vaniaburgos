@@ -37,7 +37,7 @@
                 <field name="location_id"/>
                 <field name="location_dest_id"/>
                 <field name="quantity"/>
-                <field name="move_date"/>
+                <field name="date"/>
                 <field name="move_type"/>
             </list>
         </field>
@@ -57,7 +57,7 @@
                     <group>
                         <field name="location_id"/>
                         <field name="location_dest_id"/>
-                        <field name="move_date"/>
+                        <field name="date"/>
                     </group>
                 </sheet>
             </form>
