@@ -13,13 +13,13 @@ class StockLocation(models.Model):
     description = fields.Text(string="Descripción")
 
     # Relación con movimientos de stock
-    stock_move_ids = fields.One2many('stock.move', 'source_location_id', string="Movimientos del Stock desde esta Ubicación")
+    stock_move_ids = fields.One2many('stock.move', 'location_id', string="Movimientos del Stock desde esta Ubicación")
 
 
 class StockMove(models.Model):
     _inherit = 'stock.move'
     _description = 'Movimiento del Stock'
-0
+
 class StockAdjustment(models.Model):
     _name = 'stock.adjustment'
     _description = 'Ajuste del Stock'
