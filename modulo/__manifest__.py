@@ -12,6 +12,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/acciones.xml',
+        'views/menus.xml',
         'views/producto_views.xml',
         'views/stock_operation_views.xml',
     ],
