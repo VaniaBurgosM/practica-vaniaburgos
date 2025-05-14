@@ -1,0 +1,12 @@
+<odoo>
+    <menuitem id="menu_retail_inventory_management" name="Inventario" sequence="1"/>
+
+    <menuitem id="menu_operations" name="Operaciones" parent="menu_retail_inventory_management" sequence="4"/>
+
+    <menuitem id="menu_product_template" name="Productos" parent="menu_retail_inventory_management" action="modulo.action_product_template_list" sequence="5"/>
+
+    <menuitem id="menu_inventory_management" name="Gestión de Inventario" parent="menu_retail_inventory_management" sequence="6"/>
+    <menuitem id="menu_stock_location" name="Ubicaciones de Stock" parent="menu_inventory_management" action="modulo.action_stock_location"/>
+    <menuitem id="menu_stock_move" name="Movimientos de Stock" parent="menu_inventory_management" action="modulo.action_stock_move"/>
+    <menuitem id="menu_stock_adjustment" name="Ajustes de Stock" parent="menu_inventory_management" action="modulo.action_stock_adjustment"/>
+</odoo>

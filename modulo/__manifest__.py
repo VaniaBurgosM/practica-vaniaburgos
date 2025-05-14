@@ -1,34 +1,22 @@
-# -*- coding: utf-8 -*-
 {
-    'name': "modulo",
-
-    'summary': "Short (1 phrase/line) summary of the module's purpose",
-
-    'description': """
-Long description of module's purpose
-    """,
-
-    'author': "My Company",
-    'website': "https://www.yourcompany.com",
-
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/15.0/odoo/addons/base/data/ir_module_category_data.xml
-    # for the full list
-    'category': 'Uncategorized',
+    'name': "Gestión de inventarios",
+    'summary': "Ingreso, edición y vista de inventarios.",
+    'description':"Sistema de gestión de invetarios, que permite ingresar, editar, eliminar y ver registros de un negocio determinado a través de formularios CRUD.",
+    'author': "VB",
+    'website': "https://vaniaburgosm-practica-vaniaburgos-main-20247569.dev.odoo.com/odoo",
+    'category': 'Inventory',
     'version': '0.1',
 
-    # any module necessary for this one to work correctly
-    'depends': ['base'],
+    'depends': ['base', 'stock', 'product'],
 
-    # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
-        'views/views.xml',
-        'views/templates.xml',
+        'security/ir.model.access.csv',
+        'views/menus.xml',
+        'views/acciones.xml',
     ],
-    # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
     ],
+    'installable': True,
+    'application': True,
 }
-
