@@ -1,0 +1,36 @@
+<odoo>
+    <record id="product_product_list_view" model="ir.ui.view">
+        <field name="name">product.product.list</field>
+        <field name="model">product.product</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="default_code"/>
+                <field name="categ_id"/>
+                <field name="list_price"/>
+                <field name="stock_level"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="product_product_form_view" model="ir.ui.view">
+        <field name="name">product.product.form</field>
+        <field name="model">product.product</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="default_code"/>
+                        <field name="categ_id"/>
+                    </group>
+                    <group>
+                        <field name="list_price"/>
+                        <field name="standard_price"/>
+                        <field name="stock_level"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

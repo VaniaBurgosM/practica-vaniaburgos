@@ -1,0 +1,106 @@
+<odoo>
+    <record id="stock_location_list_view" model="ir.ui.view">
+        <field name="name">stock.location.list</field>
+        <field name="model">stock.location</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="location_type"/>
+                <field name="description"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="stock_location_form_view" model="ir.ui.view">
+        <field name="name">stock.location.form</field>
+        <field name="model">stock.location</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="location_type"/>
+                    </group>
+                    <field name="description"/>
+                    <field name="stock_move_ids"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="stock_move_list_view" model="ir.ui.view">
+        <field name="name">stock.move.list</field>
+        <field name="model">stock.move</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="product_id"/>
+                <field name="location_id"/>
+                <field name="location_dest_id"/>
+                <field name="quantity"/>
+                <field name="move_date"/>
+                <field name="move_type"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="stock_move_form_view" model="ir.ui.view">
+        <field name="name">stock.move.form</field>
+        <field name="model">stock.move</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="product_id"/>
+                        <field name="quantity"/>
+                        <field name="move_type"/>
+                    </group>
+                    <group>
+                        <field name="location_id"/>
+                        <field name="location_dest_id"/>
+                        <field name="move_date"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="stock_adjustment_list_view" model="ir.ui.view">
+        <field name="name">stock.adjustment.list</field>
+        <field name="model">stock.adjustment</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="adjustment_reason"/>
+                <field name="location_id"/>
+                <field name="adjustment_date"/>
+                <field name="product_id"/>
+                <field name="adjusted_quantity"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="stock_adjustment_form_view" model="ir.ui.view">
+        <field name="name">stock.adjustment.form</field>
+        <field name="model">stock.adjustment</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="adjustment_reason"/>
+                        <field name="location_id"/>
+                        <field name="adjustment_date"/>
+                        <field name="state"/>
+                    </group>
+                    <group>
+                        <field name="product_id"/>
+                        <field name="quantity_before_adjustment"/>
+                        <field name="adjusted_quantity"/>
+                        <field name="quantity_after_adjustment"/>
+                    </group>
+                    <field name="user_id"/>
+                    <button name="confirm_adjustment" string="Confirmar Ajuste" type="object" states="draft" class="oe_highlight"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
