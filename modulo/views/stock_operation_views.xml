@@ -96,7 +96,7 @@
                         <field name="quantity_after_adjustment"/>
                     </group>
                     <field name="user_id"/>
-                    <button name="confirm_adjustment" string="Confirmar Ajuste" type="object" states="draft" class="oe_highlight"/>
+                    <button name="confirm_adjustment" string="Confirmar Ajuste" type="object" groups="base.group_user" class="oe_highlight"/>
                 </sheet>
             </form>
         </field>
