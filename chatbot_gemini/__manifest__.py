@@ -7,7 +7,7 @@
 
     'category': 'Tools',
     'version': '0.1',
-    'depends': ['base', 'mail', 'discuss'],
+    'depends': ['base', 'mail'],
 
 
     'data': [
