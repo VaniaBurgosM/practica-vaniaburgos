@@ -12,7 +12,7 @@
 
     'data': [
         'security/ir.model.access.csv',
-        'views/agente_ia_bot_view.xml',
+        'data/agente_ia_bot.xml',
     ],
     # 'demo': [
     #     'demo/demo.xml',
