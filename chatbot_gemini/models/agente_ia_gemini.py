@@ -2,6 +2,7 @@ from odoo import models, fields, api
 import requests
 import logging
 import re
+import html
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -29,12 +30,16 @@ class AgenteGemini(models.Model):
     def _message_post_after_hook(self, message, msg_vals):
         """Override para añadir respuesta de la IA cuando sea necesario"""
         result = super()._message_post_after_hook(message, msg_vals)
+        
+        # Solo continuar si estamos en un único canal con Gemini habilitado
         if len(self) != 1 or not self.is_gemini_enabled:
             return result
 
+        # Verificar que no es un mensaje del bot
         bot_user = self.env.ref('chatbot_gemini.gemini_ai_user', raise_if_not_found=False)
-            if not bot_user or message.author_id == bot_user.partner_id:
-                return result    
+        if not bot_user or message.author_id == bot_user.partner_id:
+            return result    
+            
         try:    
             _logger.info(f"_message_post_after_hook: procesando mensaje: {message.body[:50]}")
             self.with_user(bot_user)._handle_ai_response_gemini(message)
@@ -46,6 +51,7 @@ class AgenteGemini(models.Model):
 
     def _handle_ai_response_gemini(self, message):
         """Maneja la generación y publicación de la respuesta de Gemini AI"""
+        try:
             _logger.info("Iniciando _handle_ai_response_gemini")
             mensaje_usuario = message.body
             respuesta_ia = self.enviar_a_gemini(mensaje_usuario)
@@ -61,15 +67,15 @@ class AgenteGemini(models.Model):
         except Exception as e:
             _logger.error(f"Error en _handle_ai_response_gemini: {e}")
             # Intentamos publicar un mensaje de error, pero no propagamos la excepción
-        try:
-            bot_user = self.env.ref('chatbot_gemini.gemini_ai_user')
-            self.with_user(bot_user).message_post(
-                body="Ocurrió un error al procesar tu solicitud.",
-                message_type='comment',
-                subtype_xmlid='mail.mt_comment'
-            )
-        except:
-            pass
+            try:
+                bot_user = self.env.ref('chatbot_gemini.gemini_ai_user')
+                self.with_user(bot_user).message_post(
+                    body="Ocurrió un error al procesar tu solicitud.",
+                    message_type='comment',
+                    subtype_xmlid='mail.mt_comment'
+                )
+            except:
+                pass
 
     def enviar_a_gemini(self, mensaje):
         """Envía un mensaje a la API de Gemini y retorna la respuesta"""
@@ -149,7 +155,7 @@ class AgenteGemini(models.Model):
         except requests.exceptions.Timeout:
             error_message = "Tiempo de espera agotado al comunicarse con la API de Gemini"
             _logger.error(error_message)
-            return error_message"
+            return error_message
             
         except requests.exceptions.RequestException as e:
             error_message = f"Error de comunicación con la API de Gemini: {str(e)}"
