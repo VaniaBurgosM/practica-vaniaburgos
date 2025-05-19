@@ -54,7 +54,7 @@ class AgenteGemini(models.Model):
         try:
             _logger.info("Iniciando _handle_ai_response_gemini")
             mensaje_usuario = message.body
-            respuesta_ia = self.enviar_a_gemini(mensaje_usuario)
+            respuesta_ia = self.enviar_a_gemini(mensaje_usuario, message)  # Pasamos el mensaje como parámetro
 
             if respuesta_ia:
                 bot_user = self.env.ref('chatbot_gemini.gemini_ai_user')
@@ -74,18 +74,23 @@ class AgenteGemini(models.Model):
                     message_type='comment',
                     subtype_xmlid='mail.mt_comment'
                 )
-            except:
-                pass
+            except Exception as inner_e:
+                _logger.error(f"Error al enviar mensaje de error: {inner_e}")
 
-    def enviar_a_gemini(self, mensaje):
-        """Envía un mensaje a la API de Gemini y retorna la respuesta"""
+    def enviar_a_gemini(self, mensaje, mensaje_original=None):
+        """Envía un mensaje a la API de Gemini y retorna la respuesta
+        
+        Args:
+            mensaje: El texto del mensaje a enviar
+            mensaje_original: El objeto mensaje original (opcional)
+        """
         self.ensure_one()
         api_key = self.GEMINI_API_KEY
         api_url = self.GEMINI_API_URL + ":generateContent"
 
         if not api_key or not api_url:
             _logger.error("Las credenciales de la API de Gemini no están configuradas")
-            return "<p>Error de configuración: API de Gemini no configurada.</p>"
+            return "Error de configuración: API de Gemini no configurada."
 
         try:
             history = self.env['mail.message'].search([
@@ -101,15 +106,18 @@ class AgenteGemini(models.Model):
                 "content": "Eres un asistente de ventas que responde en español."
             })
 
+            bot_user = self.env.ref('chatbot_gemini.gemini_ai_user', raise_if_not_found=False)
+            bot_partner_id = bot_user.partner_id if bot_user else False
+
             for msg in reversed(history):
-                role = "model" if msg.author_id == self.env.ref('chatbot_gemini.gemini_ai_user').partner_id else "user"
+                role = "model" if msg.author_id.id == bot_partner_id.id else "user"
                 texto_limpio = limpiar_html(msg.body)
                 contents.append({
                     "role": role,
                     "parts": [{"text": texto_limpio}]
                 })
 
-            if not history or history[0].id != message.id:
+            if not mensaje_original or (history and history[0].id != mensaje_original.id):
                 texto_limpio = limpiar_html(mensaje)
                 contents.append({
                     "role": "user",
@@ -133,7 +141,7 @@ class AgenteGemini(models.Model):
                     }
                 ]
             }
-
+            
             _logger.info(f"Enviando mensaje a Gemini: {mensaje[:50]}")
             response = requests.post(api_url, params=params, headers=headers, json=data, timeout=15)
             
@@ -146,7 +154,6 @@ class AgenteGemini(models.Model):
             
             if 'candidates' in response_json and len(response_json['candidates']) > 0:
                 texto_respuesta = response_json['candidates'][0]['content']['parts'][0]['text']
-                texto_respuesta = limpiar_html(texto_respuesta) 
                 return texto_respuesta
             else:
                 _logger.warning("La API de Gemini devolvió una respuesta vacía")
