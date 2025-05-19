@@ -60,7 +60,7 @@ class AgenteGemini(models.Model):
             raise UserError("Las credenciales de la API de Gemini no están configuradas (directamente en el código).")
 
         # Obtener los últimos mensajes para el contexto
-        history = self.env['discuss.message'].search([
+        history = self.env['mail.message'].search([
             ('model', '=', 'discuss.channel'),
             ('res_id', '=', self.id), 
             ('message_type', '=', 'comment'),
