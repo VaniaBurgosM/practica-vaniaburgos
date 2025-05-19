@@ -17,20 +17,6 @@ class AgenteGemini(models.Model):
     GEMINI_API_KEY = 'AIzaSyDXrQZm5xZEDuJVQqjqo7R6-68sgab9tws'
     GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash'
 
-    @api.model
-    def crear_o_activar_canal_gemini(self):
-        canal = self.search([('name', '=', 'Gemini AI')], limit=1)
-        if not canal:
-            canal = self.create({
-                'name': 'Gemini AI',
-                'channel_type': 'public',  # o 'private'
-                'is_gemini_enabled': True,
-            })
-        else:
-            if not canal.is_gemini_enabled:
-                canal.is_gemini_enabled = True
-        return canal
-
     def _message_post_after_hook(self, message, msg_vals):
         """Override para añadir respuesta de la IA cuando sea necesario"""
         result = super()._message_post_after_hook(message, msg_vals)

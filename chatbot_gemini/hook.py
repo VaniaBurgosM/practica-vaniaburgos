@@ -3,4 +3,10 @@ from odoo import api, SUPERUSER_ID
 def post_init_hook(cr, registry):
     env = api.Environment(cr, SUPERUSER_ID, {})
     canal_model = env['discuss.channel']
-    canal_model.crear_o_activar_canal_gemini()
+    canal = canal_model.search([('name', '=', 'Canal del Chatbot')], limit=1)
+    if not canal:
+        canal_model.create({
+            'name': 'Canal del Chatbot',
+            'channel_type': 'channel',
+            'public': 'private',
+        })
