@@ -6,7 +6,7 @@ from odoo.exceptions import UserError
 _logger = logging.getLogger(__name__)
 
 class AgenteGemini(models.Model):
-    _inherit = 'mail.channel'
+    _inherit = 'discuss.channel'
 
     GEMINI_API_KEY = 'AIzaSyDXrQZm5xZEDuJVQqjqo7R6-68sgab9tws'
     GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash'

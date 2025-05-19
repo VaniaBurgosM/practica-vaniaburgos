@@ -1,3 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_agente_gemini_admin,access_agente_gemini_admin,model_mail_channel,base.group_system,1,1,1,1
-access_agente_gemini_user,access_agente_gemini_user,model_mail_channel,base.group_user,1,0,0,0
+access_agente_gemini_admin,access_agente_gemini_admin,model_discuss_channel,base.group_system,1,1,1,1
+access_agente_gemini_user,access_agente_gemini_user,model_discuss_channel,base.group_user,1,0,0,0
