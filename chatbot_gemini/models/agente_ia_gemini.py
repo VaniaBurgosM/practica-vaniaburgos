@@ -2,18 +2,9 @@ from odoo import models, fields, api
 import requests
 import logging
 import re
-import html
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
-
-def limpiar_html(texto):
-    """Elimina etiquetas HTML del texto de forma más segura"""
-    if not texto:
-        return ""
-    texto_decodificado = html.unescape(texto)
-    clean = re.compile('<.*?>')
-    return re.sub(clean, '', texto_decodificado)
 
 class AgenteGemini(models.Model):
     _inherit = 'discuss.channel'
@@ -102,8 +93,8 @@ class AgenteGemini(models.Model):
             # Construir el histórico de conversación 
             contents = []
             contents.append({
-                "role": "system",
-                "content": "Eres un asistente de ventas que responde en español."
+                "role": "user",
+                "parts": [{"text": "Eres un asistente de ventas que responde en español. A continuación, continúa la conversación:"}]
             })
 
             bot_user = self.env.ref('chatbot_gemini.gemini_ai_user', raise_if_not_found=False)
@@ -118,7 +109,6 @@ class AgenteGemini(models.Model):
                 })
 
             if not mensaje_original or (history and history[0].id != mensaje_original.id):
-                texto_limpio = limpiar_html(mensaje)
                 contents.append({
                     "role": "user",
                     "parts": [{"text": texto_limpio}]
