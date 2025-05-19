@@ -1,9 +1,15 @@
 from odoo import models, fields, api
 import requests
 import logging
+import re
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
+
+def limpiar_html(texto):
+    """Elimina etiquetas HTML del texto"""
+    clean = re.compile('<.*?>')
+    return re.sub(clean, '', texto)
 
 class AgenteGemini(models.Model):
     _inherit = 'discuss.channel'
@@ -89,6 +95,14 @@ class AgenteGemini(models.Model):
 
             # Construir el histórico de conversación en el formato correcto para Gemini
             contents = []
+
+            # Mensaje del sistema que indica que responda en español
+            contents.append({
+                "role": "system",
+                "parts": [{"text": "Eres un asistente de ventas que responde en español."}]
+            })
+
+            # Agregar el historial de mensajes previos (máximo 5)
             for msg in reversed(history):
                 role = "model" if msg.author_id == self.env.ref('chatbot_gemini.gemini_ai_user').partner_id else "user"
                 contents.append({
@@ -96,7 +110,7 @@ class AgenteGemini(models.Model):
                     "parts": [{"text": msg.body}]
                 })
 
-            # Añadir el mensaje actual
+            # Añadir el mensaje actual del usuario
             contents.append({
                 "role": "user",
                 "parts": [{"text": mensaje}]
@@ -125,6 +139,7 @@ class AgenteGemini(models.Model):
             
             if 'candidates' in response_json and len(response_json['candidates']) > 0:
                 texto_respuesta = response_json['candidates'][0]['content']['parts'][0]['text']
+                texto_respuesta = limpiar_html(texto_respuesta) 
                 return texto_respuesta
             else:
                 _logger.warning("La API de Gemini devolvió una respuesta vacía")
