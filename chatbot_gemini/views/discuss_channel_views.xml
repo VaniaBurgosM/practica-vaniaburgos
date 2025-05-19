@@ -4,9 +4,12 @@
         <field name="model">discuss.channel</field>
         <field name="inherit_id" ref="mail.discuss_channel_view_form"/>
         <field name="arch" type="xml">
-            <!-- Insertamos el checkbox dentro del formulario, por ejemplo al final de la pestaña general -->
-            <xpath expr="//page[@name='General']/group" position="inside">
-                <field name="is_gemini_enabled"/>
+            <xpath expr="//notebook" position="inside">
+                <page string="Gemini" name="gemini">
+                    <group>
+                        <field name="is_gemini_enabled"/>
+                    </group>
+                </page>
             </xpath>
         </field>
     </record>
