@@ -157,4 +157,4 @@ class AgenteGemini(models.Model):
         except Exception as e:
             error_message = f"Error inesperado: {str(e)}"
             _logger.error(error_message)
-            return f"<p>{error_message}</p>".
+            return f"<p>{error_message}</p>"
