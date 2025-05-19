@@ -7,5 +7,5 @@ def post_init_hook(env):
         canal_model.create({
             'name': 'Canal del Chatbot',
             'channel_type': 'channel',
-            'public': 'private',
+            'privacy': 'private',
         })
