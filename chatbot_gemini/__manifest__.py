@@ -15,8 +15,6 @@
         'data/agente_ia_bot.xml',
     ],
 
-    'post_init_hook': 'set_password_post_init',
-
     # 'demo': [
     #     'demo/demo.xml',
     # ], 
