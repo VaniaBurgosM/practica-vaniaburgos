@@ -44,9 +44,8 @@ class AgenteGemini(models.Model):
             )
 
     def enviar_a_gemini(self, mensaje):
-        """Envía el mensaje a la API de Gemini y devuelve la respuesta"""
         api_key = self.GEMINI_API_KEY
-        api_url = self.GEMINI_API_URL
+        api_url = self.GEMINI_API_URL + ":generateContent"
 
         if not api_key or not api_url:
             raise UserError("Las credenciales de la API de Gemini no están configuradas (directamente en el código).")
@@ -59,7 +58,6 @@ class AgenteGemini(models.Model):
         ], limit=10, order='id desc')
 
         messages = []
-
         for msg in reversed(history):
             role = "assistant" if msg.author_id == self.env.ref('chatbot_gemini.gemini_ai_user').partner_id else "user"
             messages.append({
@@ -71,19 +69,27 @@ class AgenteGemini(models.Model):
 
         params = {'key': api_key}
         headers = {'Content-Type': 'application/json'}
-        data = {'contents': [{'parts': [{'text': ' '.join([m["content"] for m in messages])}]}]}
+        data = {
+            "contents": [
+                {
+                    "parts": [
+                        {
+                            "text": ' '.join([m["content"] for m in messages])
+                        }
+                    ]
+                }
+            ]
+        }
 
         try:
-            response = requests.post(f"{api_url}", params=params, headers=headers, json=data, timeout=10)
+            response = requests.post(api_url, params=params, headers=headers, json=data, timeout=10)
             response.raise_for_status()
             response_json = response.json()
             if 'candidates' in response_json and len(response_json['candidates']) > 0:
                 return response_json['candidates'][0]['content']['parts'][0]['text']
-
             else:
                 _logger.warning("La API de Gemini devolvió una respuesta vacía.")
                 return "<p>La API de Gemini devolvió una respuesta vacía.</p>"
-
         except requests.exceptions.RequestException as e:
             error_message = f"Error al comunicarse con la API de Gemini: {e}"
             _logger.error(error_message)
