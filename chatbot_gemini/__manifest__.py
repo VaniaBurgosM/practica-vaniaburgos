@@ -13,7 +13,10 @@
     'data': [
         'security/ir.model.access.csv',
         'data/agente_ia_bot.xml',
+        'views/discuss_channel_views.xml'
     ],
+
+    'post_init_hook': 'post_init_hook',
 
     # 'demo': [
     #     'demo/demo.xml',

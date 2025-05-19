@@ -1,0 +1,14 @@
+<!-- views/discuss_channel_views.xml -->
+<odoo>
+    <record id="view_channel_form_inherit_gemini" model="ir.ui.view">
+        <field name="name">discuss.channel.form.gemini</field>
+        <field name="model">discuss.channel</field>
+        <field name="inherit_id" ref="mail.view_channel_form"/>
+        <field name="arch" type="xml">
+            <!-- Insertamos el checkbox dentro del formulario, por ejemplo al final de la pestaña general -->
+            <xpath expr="//page[@string='General']/group" position="inside">
+                <field name="is_gemini_enabled"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

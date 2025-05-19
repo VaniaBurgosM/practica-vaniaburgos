@@ -13,9 +13,23 @@ class AgenteGemini(models.Model):
         default=False,
         help="Habilita la integración con Gemini AI para este canal"
     )
-    
+
     GEMINI_API_KEY = 'AIzaSyDXrQZm5xZEDuJVQqjqo7R6-68sgab9tws'
     GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash'
+
+    @api.model
+    def crear_o_activar_canal_gemini(self):
+        canal = self.search([('name', '=', 'Gemini AI')], limit=1)
+        if not canal:
+            canal = self.create({
+                'name': 'Gemini AI',
+                'channel_type': 'public',  # o 'private'
+                'is_gemini_enabled': True,
+            })
+        else:
+            if not canal.is_gemini_enabled:
+                canal.is_gemini_enabled = True
+        return canal
 
     def _message_post_after_hook(self, message, msg_vals):
         """Override para añadir respuesta de la IA cuando sea necesario"""
@@ -31,11 +45,9 @@ class AgenteGemini(models.Model):
             if not bot_user or message.author_id == bot_user.partner_id:
                 return result
                 
-            # Verificar si el mensaje menciona al bot o comienza con un trigger
-            contenido = message.body.lower()
-            if "@gemini" in contenido or contenido.startswith("gemini"):
-                _logger.info(f"_message_post_after_hook: procesando mensaje: {message.body[:50]}")
-                self.with_user(bot_user)._handle_ai_response_gemini(message)
+            # En canal Gemini AI, respondemos a todos los mensajes (sin filtro por trigger)
+            _logger.info(f"_message_post_after_hook: procesando mensaje: {message.body[:50]}")
+            self.with_user(bot_user)._handle_ai_response_gemini(message)
                 
         except Exception as e:
             _logger.error(f"Error en _message_post_after_hook: {e}")
@@ -145,4 +157,4 @@ class AgenteGemini(models.Model):
         except Exception as e:
             error_message = f"Error inesperado: {str(e)}"
             _logger.error(error_message)
-            return f"<p>{error_message}</p>"
+            return f"<p>{error_message}</p>".
