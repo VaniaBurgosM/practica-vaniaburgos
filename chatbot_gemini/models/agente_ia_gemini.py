@@ -6,7 +6,7 @@ from odoo.exceptions import UserError
 _logger = logging.getLogger(__name__)
 
 class AgenteGemini(models.Model):
-    _inherit = 'mail.channel'
+    _inherit = 'discuss.channel'
 
     GEMINI_API_KEY = 'AIzaSyDXrQZm5xZEDuJVQqjqo7R6-68sgab9tws'
     GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash'
@@ -60,8 +60,8 @@ class AgenteGemini(models.Model):
             raise UserError("Las credenciales de la API de Gemini no están configuradas (directamente en el código).")
 
         # Obtener los últimos mensajes para el contexto
-        history = self.env['mail.message'].search([
-            ('model', '=', 'mail.channel'),
+        history = self.env['discuss.message'].search([
+            ('model', '=', 'discuss.channel'),
             ('res_id', '=', self.id), 
             ('message_type', '=', 'comment'),
         ], limit=10, order='id desc')
