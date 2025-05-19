@@ -13,6 +13,7 @@ class AgenteGemini(models.Model):
 
     def _message_post_after_hook(self, message, msg_vals):
         """Override para añadir respuesta de la IA cuando sea necesario"""
+        _logger.info(f"_message_post_after_hook: mensaje recibido: {message.body[:50]}")
         result = super()._message_post_after_hook(message, msg_vals)
         bot_user = self.env.ref('chatbot_gemini.gemini_ai_user')
 
@@ -82,7 +83,9 @@ class AgenteGemini(models.Model):
         }
 
         try:
+            _logger.info(f"Enviando mensaje a Gemini: {mensaje}")
             response = requests.post(api_url, params=params, headers=headers, json=data, timeout=10)
+            _logger.info(f"Respuesta Gemini: {response.text}")
             response.raise_for_status()
             response_json = response.json()
             if 'candidates' in response_json and len(response_json['candidates']) > 0:
