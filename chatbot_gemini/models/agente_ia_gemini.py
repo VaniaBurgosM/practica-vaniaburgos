@@ -21,7 +21,7 @@ class AgenteGemini(models.Model):
         """Override para añadir respuesta de la IA cuando sea necesario"""
         result = super()._message_post_after_hook(message, msg_vals)
     
-        # Solo continuar si estamos en un único canal con Gemini habilitado
+        # Verificar si solo hay un canal habilitado
         if len(self) != 1 or not self.is_gemini_enabled:
             return result
 
@@ -46,7 +46,7 @@ class AgenteGemini(models.Model):
         try:
             _logger.info("Iniciando _handle_ai_response_gemini")
             mensaje_usuario = message.body
-            respuesta_ia = self.enviar_a_gemini(mensaje_usuario, message)  # Pasamos el mensaje como parámetro
+            respuesta_ia = self.enviar_a_gemini(mensaje_usuario, message)
 
             if respuesta_ia:
                 bot_user = self.env.ref('chatbot_gemini.gemini_ai_user')
@@ -58,7 +58,7 @@ class AgenteGemini(models.Model):
             _logger.info("Finalizado _handle_ai_response_gemini")
         except Exception as e:
             _logger.error(f"Error en _handle_ai_response_gemini: {e}")
-            # Intentamos publicar un mensaje de error, pero no propagamos la excepción
+
             try:
                 bot_user = self.env.ref('chatbot_gemini.gemini_ai_user')
                 self.with_user(bot_user).message_post(
@@ -125,7 +125,7 @@ class AgenteGemini(models.Model):
             resumen += "\nCategorías disponibles:\n"
             resumen += ", ".join(categorias.keys())
 
-            # Construir el histórico de conversación 
+            # Construir el historial de mensajes
             contents = []
             contents.append({
                 "role": "user",
