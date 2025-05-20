@@ -1,7 +1,6 @@
 from odoo import models, fields, api
 import requests
 import logging
-import re
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -70,7 +69,7 @@ class AgenteGemini(models.Model):
 
     def enviar_a_gemini(self, mensaje, mensaje_original=None):
         """Envía un mensaje a la API de Gemini y retorna la respuesta
-        
+    
         Args:
             mensaje: El texto del mensaje a enviar
             mensaje_original: El objeto mensaje original (opcional)
@@ -90,6 +89,40 @@ class AgenteGemini(models.Model):
                 ('message_type', '=', 'comment'),
             ], limit=10, order='id desc')
 
+            # Obtener productos activos en venta
+            productos = self.env['product.template'].search([('active', '=', True), ('sale_ok', '=', True)])
+
+            # Total de productos
+            total_productos = len(productos)
+
+            # Producto más caro
+            producto_caro = max(productos, key=lambda p: p.list_price, default=None)
+
+            # Producto más barato 
+            producto_barato = min(productos.filtered(lambda p: p.list_price > 0), key=lambda p: p.list_price, default=None)
+
+            # Agrupar por categoría
+            categorias = {}
+            for p in productos:
+                nombre_cat = p.categ_id.name or "Sin categoría"
+                categorias[nombre_cat] = categorias.get(nombre_cat, 0) + 1
+
+            # Armar resumen para dar contexto a la IA
+            resumen = f"Tienes {total_productos} productos activos.\n\n"
+
+            if producto_caro:
+                resumen += f"Producto más caro: {producto_caro.name} (${producto_caro.list_price}) - Categoría: {producto_caro.categ_id.name}\n"
+
+            if producto_barato:
+                resumen += f"Producto más barato: {producto_barato.name} (${producto_barato.list_price}) - Categoría: {producto_barato.categ_id.name}\n"
+
+            resumen += "\nProductos por categoría:\n"
+            for nombre_cat, cantidad in categorias.items():
+                resumen += f"- {nombre_cat}: {cantidad} productos\n"
+
+            resumen += "\nCategorías disponibles:\n"
+            resumen += ", ".join(categorias.keys())
+
             # Construir el histórico de conversación 
             contents = []
             contents.append({
@@ -104,13 +137,18 @@ class AgenteGemini(models.Model):
                 role = "model" if msg.author_id.id == bot_partner_id.id else "user"
                 contents.append({
                     "role": role,
-                    "parts": [{"text": texto_limpio}]
+                    "parts": [{"text": msg.body}]
                 })
 
-            if not mensaje_original or (history and history[0].id != mensaje_original.id):
+            contents.append({
+                "role": "user",
+                "parts": [{"text": "Contexto adicional del negocio:\n" + resumen}]
+            })
+
+            if mensaje_original and mensaje_original.id not in history.mapped('id'):
                 contents.append({
                     "role": "user",
-                    "parts": [{"text": texto_limpio}]
+                    "parts": [{"text": mensaje_original.body}]
                 })
 
             params = {'key': api_key}
@@ -130,34 +168,34 @@ class AgenteGemini(models.Model):
                     }
                 ]
             }
-            
+
             _logger.info(f"Enviando mensaje a Gemini: {mensaje[:50]}")
             response = requests.post(api_url, params=params, headers=headers, json=data, timeout=15)
-            
+
             if response.status_code != 200:
                 error_msg = f"Error en la API de Gemini: {response.status_code}"
                 _logger.error(f"{error_msg} - {response.text}")
                 return error_msg
-                
+
             response_json = response.json()
-            
+
             if 'candidates' in response_json and len(response_json['candidates']) > 0:
                 texto_respuesta = response_json['candidates'][0]['content']['parts'][0]['text']
                 return texto_respuesta
             else:
                 _logger.warning("La API de Gemini devolvió una respuesta vacía")
                 return "No pude generar una respuesta adecuada."
-                
+
         except requests.exceptions.Timeout:
             error_message = "Tiempo de espera agotado al comunicarse con la API de Gemini"
             _logger.error(error_message)
             return error_message
-            
+
         except requests.exceptions.RequestException as e:
             error_message = f"Error de comunicación con la API de Gemini: {str(e)}"
             _logger.error(error_message)
             return error_message
-            
+
         except Exception as e:
             error_message = f"Error inesperado: {str(e)}"
             _logger.error(error_message)
