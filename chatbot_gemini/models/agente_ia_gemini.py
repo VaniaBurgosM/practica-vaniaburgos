@@ -20,7 +20,7 @@ class AgenteGemini(models.Model):
     def _message_post_after_hook(self, message, msg_vals):
         """Override para añadir respuesta de la IA cuando sea necesario"""
         result = super()._message_post_after_hook(message, msg_vals)
-        
+    
         # Solo continuar si estamos en un único canal con Gemini habilitado
         if len(self) != 1 or not self.is_gemini_enabled:
             return result
@@ -29,14 +29,16 @@ class AgenteGemini(models.Model):
         bot_user = self.env.ref('chatbot_gemini.gemini_ai_user', raise_if_not_found=False)
         if not bot_user or message.author_id == bot_user.partner_id:
             return result    
-            
+
+        if not message.body or not message.body.strip():
+            return result  
+
         try:    
             _logger.info(f"_message_post_after_hook: procesando mensaje: {message.body[:50]}")
             self.with_user(bot_user)._handle_ai_response_gemini(message)
-                
         except Exception as e:
             _logger.error(f"Error en _message_post_after_hook: {e}")
-            
+        
         return result
 
     def _handle_ai_response_gemini(self, message):
