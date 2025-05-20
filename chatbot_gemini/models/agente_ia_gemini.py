@@ -102,7 +102,6 @@ class AgenteGemini(models.Model):
 
             for msg in reversed(history):
                 role = "model" if msg.author_id.id == bot_partner_id.id else "user"
-                texto_limpio = limpiar_html(msg.body)
                 contents.append({
                     "role": role,
                     "parts": [{"text": texto_limpio}]
