@@ -14,7 +14,8 @@ Este módulo permite a los vendedores registrar un check-in georreferenciado dir
     'category': 'Sales/CRM',
     'version': '0.1',
     'license': 'LGPL-3',
-    'depends': ['crm'],
+    'depends': ['project',
+                'industry_fms'],
 
     'data': [
         'security/ir.model.access.csv',
