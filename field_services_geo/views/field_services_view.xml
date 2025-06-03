@@ -16,7 +16,7 @@
                         <field name="checkin_distance_km"/>
                         <button name="action_geo_checkin"
                                 string="Registrar Check-In"
-                                type="object"
+                                type="button"
                                 title="Registrar"
                                 class="btn btn-primary o_geo_checkin_button"/>
                     </group>
