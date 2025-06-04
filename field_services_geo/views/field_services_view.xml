@@ -14,7 +14,8 @@
                         <field name="checkin_longitude"/>
                         <field name="checkin_datetime"/>
                         <field name="checkin_distance_km"/>
-                        <button
+                         <!--este botón no tiene ninguna funcionalidad pero es necesario declarar name para que odoo carge la vista XML-->
+                        <button name="boton-inutil"
                             type="object"
                             string="Registrar Check-In"
                             class="btn btn-primary o_geo_checkin_button"
