@@ -48,6 +48,9 @@ odoo.define('crm_geo_checkin.geo_checkin', function (require) {
             const self = this;
 
             if (event.data.attrs.class && event.data.attrs.class.includes('o_geo_checkin_button')) {
+                // PREVENIR que Odoo procese este botón normalmente
+                event.stopPropagation();
+                
                 if (!navigator.geolocation) {
                     this.displayNotification({
                         title: _t("Error"),
@@ -81,6 +84,12 @@ odoo.define('crm_geo_checkin.geo_checkin', function (require) {
                                     type: 'danger',
                                 });
                             }
+                        }).catch(function (error) {
+                            self.displayNotification({
+                                title: _t("Error"),
+                                message: _t("Error del servidor: ") + (error.message || 'Error desconocido'),
+                                type: 'danger',
+                            });
                         });
                     },
                     function (error) {
@@ -96,7 +105,11 @@ odoo.define('crm_geo_checkin.geo_checkin', function (require) {
                         maximumAge: 0,
                     }
                 );
+                
+                // NO llamar al _super para este botón específico
+                return;
             } else {
+                // Para otros botones, comportamiento normal
                 this._super.apply(this, arguments);
             }
         }
