@@ -65,7 +65,7 @@ odoo.define('crm_geo_checkin.geo_checkin', function (require) {
                         rpc.query({
                             model: 'project.task',
                             method: 'action_geo_checkin',
-                            args: [[self.initialState.data.id], latitude, longitude],
+                            args: [[self.model.get(self.handle).res_id], latitude, longitude],
                         }).then(function (result) {
                             if (result.status === 'success') {
                                 self.displayNotification({
