@@ -1,6 +1,5 @@
 odoo.define('field_services_geo.geo_checkin', function (require) {
     "use strict";
-    
     const FormController = require('web.FormController');
     const rpc = require('web.rpc');
     const core = require('web.core');
@@ -16,6 +15,22 @@ odoo.define('field_services_geo.geo_checkin', function (require) {
                 event.stopPropagation();
                 // Previene cualquier acción predeterminada del navegador (ej. envío de formulario)
                 event.preventDefault();
+
+                 // Marcar el evento como manejado para evitar procesamiento adicional
+                event.data.handled = true;
+                
+                this._handleGeoCheckin(event);
+                
+                // Retornar false para indicar que el evento fue manejado
+                return false;
+            }
+            
+            // Solo llamar al método padre si NO es nuestro botón
+            return this._super.apply(this, arguments);
+        },
+        
+        _handleGeoCheckin(event) {
+            const self = this;
                 
                 // Verificar soporte de geolocalización
                 if (!navigator.geolocation) {
