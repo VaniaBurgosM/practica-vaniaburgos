@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
@@ -10,23 +11,18 @@
             <xpath expr="//notebook" position="inside">
                 <page name="geolocation" string="Geolocalización">
                     <group>
-                        <field name="checkin_latitude" readonly="1"/>
-                        <field name="checkin_longitude" readonly="1"/>
-                        <field name="checkin_datetime" readonly="1"/>
-                        <field name="checkin_distance_km" readonly="1"/>
-                        
-                        <!-- Botón optimizado para captura automática -->
+                        <field name="checkin_latitude"/>
+                        <field name="checkin_longitude"/>
+                        <field name="checkin_datetime"/>
+                        <field name="checkin_distance_km"/>
                         <button name="action_geo_checkin"
-                                string="Registrar check-in"
-                                type="object"
-                                title="Captura automática de coordenadas GPS y registra check-in"
-                                class="btn btn-success o_geo_checkin_button oe_highlight"
-                                icon="fa-location-arrow"
-                                invisible="not id"/>
+                            type="object"
+                            string="Registrar Check-In"
+                            class="btn btn-primary o_geo_checkin_button"
+                            title="Registrar"/>
                     </group>
                 </page>
             </xpath>
         </field>
     </record>
-
 </odoo>

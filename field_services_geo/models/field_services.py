@@ -25,27 +25,24 @@ class FieldServices(models.Model):
     partner_longitude = fields.Float(related='partner_id.partner_longitude', store=True)
     
     def action_geo_checkin(self, latitude, longitude):
-        
-        
-        self.ensure_one() #Esto previene errores si alguien intenta ejecutar esto sobre varios registros a la vez.
+        self.ensure_one()
     
-        #Aqui valida los datos recibidos desde el js 
         if not latitude or not longitude:
             raise UserError("No se recibieron coordenadas válidas para el check-in.")
     
-        #aqui se guardan las coordenadas y la fecha/hora actual
         self.checkin_latitude = latitude
         self.checkin_longitude = longitude
         self.checkin_datetime = fields.Datetime.now()
-        
-        #Aqui esta el apartado del llamado a haversine
-        self._compute_checkin_distance() #cambiar por como se llame la def de alex
+        self._compute_checkin_distance()
+    
         return {
             'status': 'success',
             'message': 'Check-in registrado correctamente',
             'datetime': self.checkin_datetime,
             'distance_km': self.checkin_distance_km,
         }
+
+        
     
     @api.depends('checkin_latitude', 'checkin_longitude', 'partner_latitude', 'partner_longitude')
     def _compute_checkin_distance(self):
