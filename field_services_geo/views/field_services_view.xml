@@ -16,7 +16,7 @@
                         <field name="checkin_distance_km"/>
                          <!--este botón no tiene ninguna funcionalidad pero es necesario declarar name para que odoo carge la vista XML-->
                         <button name="boton-inutil"
-                            type="button"
+                            type="object"
                             string="Registrar Check-In"
                             class="btn btn-primary o_geo_checkin_button"
                             title="Registrar"/>
