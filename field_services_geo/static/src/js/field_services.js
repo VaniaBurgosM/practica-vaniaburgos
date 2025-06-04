@@ -140,10 +140,6 @@ odoo.define('field_services_geo.geo_checkin', function (require) {
                     },
                     options
                 );
-            } else {
-                //Llamar al método padre 
-                return this._super.apply(this, arguments);
-            }
-        }
+            } 
+        });
     });
-});
