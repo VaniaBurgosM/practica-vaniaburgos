@@ -18,7 +18,7 @@
                         <!-- Botón optimizado para captura automática -->
                         <button name="action_geo_checkin"
                                 string="Registrar check-in"
-                                type="button"
+                                type="object"
                                 title="Captura automática de coordenadas GPS y registra check-in"
                                 class="btn btn-success o_geo_checkin_button oe_highlight"
                                 icon="fa-location-arrow"
