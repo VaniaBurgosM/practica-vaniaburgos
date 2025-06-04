@@ -14,7 +14,7 @@
                         <field name="checkin_longitude"/>
                         <field name="checkin_datetime"/>
                         <field name="checkin_distance_km"/>
-                        <button name="action_geo_checkin"
+                        <button
                             type="object"
                             string="Registrar Check-In"
                             class="btn btn-primary o_geo_checkin_button"
