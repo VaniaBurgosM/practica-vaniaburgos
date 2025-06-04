@@ -12,6 +12,10 @@ odoo.define('field_services_geo.geo_checkin', function (require) {
             
             // Detecta el botón
             if (event.data.attrs.class === 'o_geo_checkin_button') {
+                // Detiene la propagación del evento para que Odoo no lo procese más
+                event.stopPropagation();
+                // Previene cualquier acción predeterminada del navegador (ej. envío de formulario)
+                event.preventDefault();
                 
                 // Verificar soporte de geolocalización
                 if (!navigator.geolocation) {
