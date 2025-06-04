@@ -13,8 +13,7 @@ odoo.define('field_services_geo.geo_checkin', function (require) {
          * @override
          */
         _onButtonClicked: function(event) {
-            const self = this;
-            const buttonAttrs = event.data.attrs;0
+            const buttonAttrs = event.data.attrs;
 
             // Verificar si el botón clickeado es nuestro botón personalizado
             if (buttonAttrs && buttonAttrs.class && buttonAttrs.class.includes('o_geo_checkin_button')) {
