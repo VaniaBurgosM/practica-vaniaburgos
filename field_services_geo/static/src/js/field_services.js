@@ -47,7 +47,7 @@ odoo.define('crm_geo_checkin.geo_checkin', function (require) {
         _onButtonClicked: function (event) {
             const self = this;
 
-            if (event.data.attrs.class === 'o_geo_checkin_button') {
+            if (event.data.attrs.class && event.data.attrs.class.includes('o_geo_checkin_button')) {
                 if (!navigator.geolocation) {
                     this.displayNotification({
                         title: _t("Error"),
