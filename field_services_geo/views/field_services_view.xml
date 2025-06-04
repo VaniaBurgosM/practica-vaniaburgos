@@ -22,7 +22,7 @@
                                 title="Captura automática de coordenadas GPS y registra check-in"
                                 class="btn btn-success o_geo_checkin_button oe_highlight"
                                 icon="fa-location-arrow"
-                                attrs="{'invisible': [('id', '=', False)]}"/>
+                                invisible="not id"/>
                     </group>
                 </page>
             </xpath>
