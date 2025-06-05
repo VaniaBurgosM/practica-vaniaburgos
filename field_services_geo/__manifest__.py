@@ -20,6 +20,7 @@ Este módulo permite a los vendedores registrar un check-in georreferenciado dir
     'data': [
         'security/ir.model.access.csv',
         'views/field_services_view.xml',
+        'views/field_services_template.xml'
     ],
 
     'assets': {

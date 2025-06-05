@@ -1,117 +1,133 @@
-odoo.define('crm_geo_checkin.geo_checkin', function (require) {
+odoo.define('crm_geo_checkin.geo_widget', function (require) {
     "use strict";
 
-    const FormController = require('web.FormController');
+    const AbstractField = require('web.AbstractField');
+    const fieldRegistry = require('web.field_registry');
     const rpc = require('web.rpc');
     const core = require('web.core');
 
     const _t = core._t;
 
-    FormController.include({
-        renderView: function () {
-            const self = this;
-
-            return this._super.apply(this, arguments).then(function () {
-                if (self.modelName === 'project.task') {
-                    if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(
-                            function (position) {
-                                const latitude = position.coords.latitude;
-                                const longitude = position.coords.longitude;
-                                const now = new Date().toISOString();
-
-                                self.model.notifyChanges(self.handle, {
-                                    checkin_latitude: latitude,
-                                    checkin_longitude: longitude,
-                                    checkin_datetime: now,
-                                });
-                            },
-                            function (error) {
-                                self.displayNotification({
-                                    title: _t("Error"),
-                                    message: _t("No se pudo obtener la ubicación automáticamente: ") + error.message,
-                                    type: 'danger',
-                                });
-                            },
-                            {
-                                enableHighAccuracy: true,
-                                timeout: 10000,
-                                maximumAge: 0,
-                            }
-                        );
-                    }
-                }
-            });
+    const GeoCheckinWidget = AbstractField.extend({
+        template: 'GeoCheckinWidget',
+        events: {
+            'click .o_geo_checkin_btn': '_onCheckinClick',
         },
 
-        _onButtonClicked: function (event) {
+        init: function () {
+            this._super.apply(this, arguments);
+            this.checkin_status = 'pending'; // pending, loading, success, error
+        },
+
+        _render: function () {
+            this._super.apply(this, arguments);
+            this._updateButtonState();
+        },
+
+        _updateButtonState: function () {
+            const $button = this.$('.o_geo_checkin_btn');
+            const $status = this.$('.o_checkin_status');
+            
+            $button.removeClass('btn-primary btn-secondary btn-success btn-danger');
+            
+            switch (this.checkin_status) {
+                case 'loading':
+                    $button.addClass('btn-secondary').prop('disabled', true);
+                    $button.text(_t('Obteniendo ubicación...'));
+                    break;
+                case 'success':
+                    $button.addClass('btn-success').prop('disabled', false);
+                    $button.text(_t('Check-In Registrado'));
+                    break;
+                case 'error':
+                    $button.addClass('btn-danger').prop('disabled', false);
+                    $button.text(_t('Reintentar Check-In'));
+                    break;
+                default:
+                    $button.addClass('btn-primary').prop('disabled', false);
+                    $button.text(_t('Registrar Check-In'));
+            }
+        },
+
+        _onCheckinClick: function (event) {
+            event.preventDefault();
             const self = this;
 
-            if (event.data.attrs.class && event.data.attrs.class.includes('o_geo_checkin_button')) {
-                // PREVENIR que Odoo procese este botón normalmente
-                event.stopPropagation();
-                
-                if (!navigator.geolocation) {
-                    this.displayNotification({
-                        title: _t("Error"),
-                        message: _t("Tu navegador no soporta geolocalización."),
-                        type: 'danger',
-                    });
-                    return;
-                }
+            if (!navigator.geolocation) {
+                this.displayNotification({
+                    title: _t("Error"),
+                    message: _t("Tu navegador no soporta geolocalización."),
+                    type: 'danger',
+                });
+                return;
+            }
 
-                navigator.geolocation.getCurrentPosition(
-                    function (position) {
-                        const latitude = position.coords.latitude;
-                        const longitude = position.coords.longitude;
+            this.checkin_status = 'loading';
+            this._updateButtonState();
 
-                        rpc.query({
-                            model: 'project.task',
-                            method: 'action_geo_checkin',
-                            args: [[self.model.get(self.handle).res_id], latitude, longitude],
-                        }).then(function (result) {
-                            if (result.status === 'success') {
-                                self.displayNotification({
-                                    title: _t("Check-In Exitoso"),
-                                    message: `${result.message}\nDistancia: ${result.distance_km.toFixed(2)} km`,
-                                    type: 'success',
-                                });
-                                self.reload();
-                            } else {
-                                self.displayNotification({
-                                    title: _t("Error"),
-                                    message: _t("No se pudo registrar el check-in."),
-                                    type: 'danger',
-                                });
-                            }
-                        }).catch(function (error) {
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    rpc.query({
+                        model: 'project.task',
+                        method: 'action_geo_checkin',
+                        args: [[self.res_id], latitude, longitude],
+                    }).then(function (result) {
+                        if (result.status === 'success') {
+                            self.checkin_status = 'success';
+                            self._updateButtonState();
+                            
+                            self.displayNotification({
+                                title: _t("Check-In Exitoso"),
+                                message: `${result.message}\nDistancia: ${result.distance_km.toFixed(2)} km`,
+                                type: 'success',
+                            });
+                            
+                            // Recargar el formulario para mostrar datos actualizados
+                            self.trigger_up('reload');
+                        } else {
+                            self.checkin_status = 'error';
+                            self._updateButtonState();
+                            
                             self.displayNotification({
                                 title: _t("Error"),
-                                message: _t("Error del servidor: ") + (error.message || 'Error desconocido'),
+                                message: _t("No se pudo registrar el check-in."),
                                 type: 'danger',
                             });
-                        });
-                    },
-                    function (error) {
+                        }
+                    }).catch(function (error) {
+                        self.checkin_status = 'error';
+                        self._updateButtonState();
+                        
                         self.displayNotification({
                             title: _t("Error"),
-                            message: _t("No se pudo obtener la ubicación: ") + error.message,
+                            message: _t("Error del servidor: ") + (error.message || 'Error desconocido'),
                             type: 'danger',
                         });
-                    },
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 0,
-                    }
-                );
-                
-                // NO llamar al _super para este botón específico
-                return;
-            } else {
-                // Para otros botones, comportamiento normal
-                this._super.apply(this, arguments);
-            }
-        }
+                    });
+                },
+                function (error) {
+                    self.checkin_status = 'error';
+                    self._updateButtonState();
+                    
+                    self.displayNotification({
+                        title: _t("Error"),
+                        message: _t("No se pudo obtener la ubicación: ") + error.message,
+                        type: 'danger',
+                    });
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 0,
+                }
+            );
+        },
     });
+
+    fieldRegistry.add('geo_checkin_widget', GeoCheckinWidget);
+
+    return GeoCheckinWidget;
 });
