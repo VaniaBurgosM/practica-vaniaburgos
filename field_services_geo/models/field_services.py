@@ -2,7 +2,6 @@ from odoo import models, fields, api
 from math import radians, cos, sin, asin, sqrt
 from odoo import _
 import logging
-import requests
 import unicodedata
 from odoo.exceptions import UserError
 
@@ -88,59 +87,33 @@ class CrmLead(models.Model):
         return True
 
     def get_coords_from_address(self, address):
-        address = unicodedata.normalize('NFKD', address).encode('ascii', 'ignore').decode('utf-8')
+        import requests
         
-        # Try multiple address variations for better geocoding success
-        address_variations = [
-            address,  # Original full address
-            # Remove specific details like "Bodega 4A" that might not be in geocoding databases
-            ', '.join([part.strip() for part in address.split(',') if 'bodega' not in part.lower() and 'oficina' not in part.lower()]),
-            # Try with just street, city, and country
-            f"{address.split(',')[0]}, {address.split(',')[2] if len(address.split(',')) > 2 else ''}, {address.split(',')[-1]}".replace(', ,', ',').strip(','),
-        ]
-        
-        url = 'https://nominatim.openstreetmap.org/search'
-        headers = {
-            'User-Agent': 'OdooGeoCheckin/1.0'
+        api_key = self.env['ir.config_parameter'].sudo().get_param('google_maps_api_key')
+        if not api_key:
+            raise UserError (_("No se ha configurado la clave de API de Google Maps en 'ir.config_parameter'"))
+
+        params = {
+            'address': address,
+            'key': api_key
         }
+
+        try:
+            response = requests.get('https://maps.googleapis.com/maps/api/geocode/json', params=params, timeout=10)
+            response.raise_for_status()
+            result = response.json() 
+
+            if result['status'] == 'OK':
+                location = result['results'][0]['geometry']['location']
+                latitude = location['lat']
+                longitude = location['lng']
+                _logger.info(f"Google Maps: Coordenadas para '{address}': ({latitude}, {longitude})")
+                return latitude, longitude
         
-        for attempt, addr in enumerate(address_variations, 1):
-            if not addr.strip():
-                continue
-                
-            params = {
-                'q': addr.strip(),
-                'format': 'json',
-                'limit': 1,
-            }
-
-            import urllib.parse
-            query_string = urllib.parse.urlencode(params)
-            _logger.info(f"Intento {attempt} - URL de consulta: {url}?{query_string}")
-            _logger.info(f"Dirección buscada: {addr}")
-
-            try:
-                response = requests.get(url, params=params, headers=headers, timeout=10)
-                response.raise_for_status()
-
-                _logger.info(f"Response status: {response.status_code}")
-                _logger.info(f"Response content: {response.text}")
-
-                data = response.json()
-                if data:
-                    latitude = data[0]['lat']
-                    longitude = data[0]['lon']
-                    _logger.info(f"Coordenadas encontradas en intento {attempt} para '{addr}': ({latitude}, {longitude})")
-                    return latitude, longitude
-                else:
-                    _logger.warning(f"Intento {attempt}: No se encontraron coordenadas para la dirección: {addr}")
-                    
+            else:
+                _logger.warning(f"Google Maps: Error en geocodificación para '{address}': {result.get('status')}")
+                return None, None
+        
             except requests.exceptions.RequestException as e:
-                _logger.error(f"Intento {attempt}: Error al consultar Nominatim para la dirección '{addr}': {e}")
-                
-            # Add a small delay between requests to be respectful to the API
-            import time
-            time.sleep(1)
-        
-        _logger.warning(f"No se pudieron obtener coordenadas después de {len(address_variations)} intentos para: {address}")
-        return None, None
+                _logger.error(f"Google Maps: Error al hacer la solicitud: {e}")
+                return None, None
