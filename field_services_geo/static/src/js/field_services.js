@@ -1,4 +1,4 @@
-odoo.define('crm_geo_checkin.geo_widget', function (require) {
+odoo.define('field_services_geo.geo_widget', function (require) {
     "use strict";
 
     const AbstractField = require('web.AbstractField');
@@ -9,7 +9,7 @@ odoo.define('crm_geo_checkin.geo_widget', function (require) {
     const _t = core._t;
 
     const GeoCheckinWidget = AbstractField.extend({
-        template: 'GeoCheckinWidget',
+        template: 'GeoCheckinWidget', 
         events: {
             'click .o_geo_checkin_btn': '_onCheckinClick',
         },
