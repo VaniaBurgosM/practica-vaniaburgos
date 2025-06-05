@@ -15,9 +15,9 @@ class CrmLead(models.Model):
     checkin_datetime = fields.Datetime(string="Fecha del Check-In")
     checkin_distance_km = fields.Float(string="Distancia (km)", digits=(8, 2))
 
-    def get_location(self, location_data):
-        latitude = location_data.get('latitude')
-        longitude = location_data.get('longitude')
+    def get_location(self, **kwargs):
+        latitude = kwargs.get('latitude')
+        longitude = kwargs.get('longitude')
         distance_km = 0.0  # Initialize the variable at the beginning
 
         # Si no hay datos de ubicación, notificar un error y salir
@@ -75,15 +75,13 @@ class CrmLead(models.Model):
             lead.checkin_longitude = longitude
             lead.checkin_datetime = fields.Datetime.now()
             _logger.info(f"Checkin: Lead: [{lead.id}] actualizado a {latitude}, {longitude}")
-
-        # Si todo fue bien, retorna la notificación de éxito
+      
         return {
             'distance_km': f"{distance_km:.2f}"
         }
 
     def get_location_button(self):
         _logger.info("Botón de check-in presionado, obteniendo ubicación...")
-        # Este método ahora simplemente inicia el proceso, el resultado se maneja en get_location
         return True
 
     def get_coords_from_address(self, address):
