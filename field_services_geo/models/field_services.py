@@ -26,20 +26,21 @@ class CrmLead(models.Model):
             _logger.error("No se recibieron datos de ubicación (latitud o longitud).")
             raise UserError(_("No se pudo obtener la ubicación. Asegúrate de que los servicios de ubicación estén activados."))
 
-        address_parts = filter(None, [
-    		partner.name,
-    		partner.street,
-    		partner.street2,
-    		partner.zip,
-    		partner.city,
-    		partner.state_id.name if partner.state_id else '',
-    		partner.country_id.name if partner.country_id else ''
-	])
-	full_address = ', '.join(address_parts)
-	_logger.info(f"Dirección del contacto: {full_address}")
-
-                full_address = f"{street}, {city}, {state}, {country}"
+        for lead in self:
+            partner = lead.partner_id
+            if partner:
+                address_parts = filter(None, [
+                    partner.name,
+                    partner.street,
+                    partner.street2,
+                    partner.zip,
+                    partner.city,
+                    partner.state_id.name if partner.state_id else '',
+                    partner.country_id.name if partner.country_id else ''
+                ])
+                full_address = ', '.join(address_parts)
                 _logger.info(f"Dirección del contacto: {full_address}")
+
                 leadlat, leadlon = self.get_coords_from_address(full_address)
                 
                 if leadlat is not None and leadlon is not None:
@@ -65,8 +66,6 @@ class CrmLead(models.Model):
                 else:
                     # Si no se pueden obtener las coordenadas del cliente
                     _logger.warning(f"No se pudieron obtener las coordenadas para la dirección del cliente: {full_address}. No se verificará la distancia.")
-                    # Puedes decidir si esto debe ser un fallo o solo una advertencia
-                    # raise UserError(_("No se pudieron obtener las coordenadas del cliente para verificar la distancia."))
                     lead.checkin_distance_km = 0.0 # O un valor que indique que no se pudo calcular la distancia
 
             else:
