@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<templates>
+<templates xml:space="preserve">
     <t t-name="GeoCheckinWidget">
         <div class="o_geo_checkin_widget">
             <button class="btn btn-primary o_geo_checkin_btn" type="button">

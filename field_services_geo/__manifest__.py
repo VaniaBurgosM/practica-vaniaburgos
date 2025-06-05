@@ -20,17 +20,16 @@ Este módulo permite a los vendedores registrar un check-in georreferenciado dir
     'data': [
         'security/ir.model.access.csv',
         'views/field_services_view.xml',
-        'views/field_services_template.xml'
     ],
 
     'assets': {
         'web.assets_backend': [
-            'crm_geo_checkin/static/src/js/geo_checkin.js',
-            'crm_geo_checkin/static/src/js/geo_checkin_hook.js',
+            'field_services_geo/static/src/js/field_services.js',
+        ],
+        'web.assets_qweb': [
+            'field_services_geo/static/src/xml/field_services_template.xml',
         ],
     },
-
     'installable': True,
     'application': False,
-    'auto_install': False,
 }
