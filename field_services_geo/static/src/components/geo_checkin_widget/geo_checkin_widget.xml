@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="field_services_geo.GeoCheckinWidget"> <div class="o_geo_checkin_widget">
+            <button class="btn btn-primary o_geo_checkin_btn" type="button">
+                Registrar Check-In
+            </button>
+            <div class="o_checkin_status mt-2" style="font-size: 12px; color: #6c757d;">
+                <i class="fa fa-map-marker"></i> Haz clic para registrar tu ubicación
+            </div>
+        </div>
+    </t>
+</templates>

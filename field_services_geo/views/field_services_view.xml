@@ -19,7 +19,6 @@
                             </group>
                         </group>
                         
-                        <!-- Widget personalizado para el botón -->
                         <div class="mt-3">
                             <field name="id" widget="geo_checkin_widget" nolabel="1"/>
                         </div>
