@@ -114,6 +114,6 @@ class CrmLead(models.Model):
                 _logger.warning(f"Google Maps: Error en geocodificación para '{address}': {result.get('status')}")
                 return None, None
         
-            except requests.exceptions.RequestException as e:
-                _logger.error(f"Google Maps: Error al hacer la solicitud: {e}")
-                return None, None
+        except requests.exceptions.RequestException as e:
+            _logger.error(f"Google Maps: Error al hacer la solicitud: {e}")
+            return None, None
